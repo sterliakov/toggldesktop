@@ -1199,7 +1199,7 @@ error User::UserID(
     if (!ok) {
         return error("error parsing UserID JSON");
     }
-    *result = root["data"]["id"].asUInt64();
+    *result = root["id"].asUInt64();
     return noError;
 }
 

@@ -1634,7 +1634,7 @@ error Context::fetchMessage(const bool periodic) {
                 logger.debug("Required fields are missing in in-app message JSON");
                 return noError;
             }
-            
+
             if (!root.isMember("url-" + shortOSName())) {
                 logger.debug("URL not defined for the platform ", shortOSName(), ", will not show the message");
                 return noError;
@@ -4918,7 +4918,7 @@ error Context::StartAutotrackerEvent(const TimelineEvent &event) {
         }
 
         if (runningEntry) {
-            bool isRunningEntryMatchingAutotrackerRuleProject = 
+            bool isRunningEntryMatchingAutotrackerRuleProject =
                 rule->PID() == runningEntry->PID() && (!rule->TID() || rule->TID() == runningEntry->TID());
 
             if (isRunningEntryMatchingAutotrackerRuleProject) {
@@ -6059,13 +6059,9 @@ error Context::me(
 
         std::stringstream ss;
         ss << "/api/"
-           << kAPIV8
+           << kAPIV9
            << "/me"
-           << "?app_name=" << TogglClient::Config.AppName
-           << "&with_related_data=true";
-        if (since) {
-            ss << "&since=" << since;
-        }
+           << "?with_related_data=true";
 
         HTTPRequest req;
         req.host = urls::API();
