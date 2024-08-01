@@ -1,11 +1,59 @@
-### ⚠️ Project Status: Superseded by new rewritten apps.
+# ⚠️ Project Status
 
-We have rewritten our MacOS and Windows apps and for that reason **we will no longer implement nor accept pull requests** implementing new features in this repository.
+This is a fork of a discontinued Toggl app. The sole purpose of this repository is to keep it working under linux - apparently, upstream maintainers no longer care about us.
 
-If you'd like to try these rewritten native apps, visit:
+It may build or not build on other platforms. I'm using this on Ubuntu only, 
+but any other distros are more than welcome - please open pull requests 
+explaining build details on other distros. I'll try to review any test your 
+suggestions promptly, and your recipes will be added to this README.
+
+If you feel interested in testing or fixing builds on platforms other than
+linux - contributions are welcome. Please be aware that I won't be able to test
+Windows or MacOS builds, so the recipes will likely either stay in issues/PRs
+or be incorporated with "not tested, not my responsibility" disclaimer and 
+showing your attribution.
+
+# Recipes
+
+## Ubuntu installation
+
+I won't claim that this is the only/the best way to build. This is what works for me. 
+
+System libraries (this list may be non-exhaustive, but is enough to build in ubuntu:22.04 image):
+
+```sh
+apt-get update
+apt-get install -y --no-install-recommends \
+    git build-essential cmake libpoco-dev \
+    libjsoncpp-dev libxmu-headers libssl-dev libxss-dev \
+    qtbase5-private-dev libqt5x11extras5-dev libqt5networkauth5-dev qtbase5-dev
+```
+
+Build:
+
+```sh
+set -euo pipefail
+git clone https://github.com/sterliakov/toggldesktop --depth 1
+cd toggldesktop
+mkdir -p build && cd build
+cmake -DTOGGL_PRODUCTION_BUILD=ON -DUSE_BUNDLED_LIBRARIES=OFF ..
+make -j8  # Adjust process limit to your system
+# Run the executable
+./src/ui/linux/TogglDesktop/TogglDesktop
+```
+
+Now copy the binary to whatever directory you like on PATH, and you're good to go! E.g.
+
+```sh
+cp ./src/ui/linux/TogglDesktop/TogglDesktop ~/.local/bin/toggl
+```
+
+# MacOS and Windows
 
 * [ ] 🍏 [MacOS Toggl Track](https://toggl.com/track/time-tracking-mac)
 * [ ] 🖥 [Windows Toggl Track](https://toggl.com/track/time-tracking-windows/)
+
+# Original README
 
 <h1></h1>
 
