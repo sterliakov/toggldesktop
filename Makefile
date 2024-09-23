@@ -339,7 +339,7 @@ build/test/gtest-all.o: $(GTEST_ROOT)/src/gtest-all.cc
 
 build/onboarding_service.o: src/onboarding_service.cpp
 	$(cxx) $(cflags) -c src/onboarding_service.cpp -o build/onboarding_service.o
-	
+
 build/alpha_features.o: src/alpha_features.cpp
 	$(cxx) $(cflags) -c src/alpha_features.cpp -o build/alpha_features.o
 
