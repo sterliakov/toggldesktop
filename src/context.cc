@@ -5417,10 +5417,35 @@ error Context::pullAllUserData() {
             TimeEntry *running_entry = user_->RunningTimeEntry();
 
             err = user_->LoadUserAndRelatedDataFromJSONString(user_data_json, !since, false);
-
             if (err != noError) {
                 return err;
             }
+
+            err = pullTimeEntries();
+            if (err != noError) {
+                return err;
+            }
+            err = pullProjects();
+            if (err != noError) {
+                return err;
+            }
+            err = pullWorkspaces();
+            if (err != noError) {
+                return err;
+            }
+            err = pullClients();
+            if (err != noError) {
+                return err;
+            }
+            err = pullTasks();
+            if (err != noError) {
+                return err;
+            }
+            err = pullTags();
+            if (err != noError) {
+                return err;
+            }
+
             overlay_visible_ = false;
             TimeEntry *new_running_entry = user_->RunningTimeEntry();
 
@@ -6060,8 +6085,7 @@ error Context::me(
         std::stringstream ss;
         ss << "/api/"
            << kAPIV9
-           << "/me"
-           << "?with_related_data=true";
+           << "/me";
 
         HTTPRequest req;
         req.host = urls::API();
@@ -6160,6 +6184,196 @@ bool Context::isTimeLockedInWorkspace(time_t t, Workspace* ws) {
     if (lockedTime == 0)
         return false;
     return t < lockedTime;
+}
+
+error Context::pullTimeEntries() {
+    std::string api_token = user_->APIToken();
+
+    if (api_token.empty()) {
+        return error("cannot pull user data without API token");
+    }
+
+    std::string json("");
+
+    try {
+        HTTPRequest req;
+        req.host = urls::API();
+        req.relative_url = "/api/v9/me/time_entries";
+        req.basic_auth_username = api_token;
+        req.basic_auth_password = "api_token";
+
+        HTTPResponse resp = TogglClient::GetInstance().Get(req);
+        if (resp.err != noError) {
+            if (resp.err.find(kForbiddenError) != std::string::npos) {
+                // User has no workspaces
+                return error(kMissingWS); // NOLINT
+            }
+            return resp.err;
+        }
+
+        json = resp.body;
+
+        user_->LoadTimeEntriesFromJSONString(json);
+    } catch (const Poco::Exception& exc) {
+        return exc.displayText();
+    } catch (const std::exception& ex) {
+        return ex.what();
+    } catch (const std::string & ex) {
+        return ex;
+    }
+    return noError;
+}
+
+error Context::pullProjects() {
+    std::string api_token = user_->APIToken();
+
+    if (api_token.empty()) {
+        return error("cannot pull user data without API token");
+    }
+
+    std::string json("");
+
+    try {
+        HTTPRequest req;
+        req.host = urls::API();
+        req.relative_url = "/api/v9/me/projects";
+        req.basic_auth_username = api_token;
+        req.basic_auth_password = "api_token";
+
+        HTTPResponse resp = TogglClient::GetInstance().Get(req);
+        if (resp.err != noError) {
+            if (resp.err.find(kForbiddenError) != std::string::npos) {
+                // User has no workspaces
+                return error(kMissingWS); // NOLINT
+            }
+            return resp.err;
+        }
+
+        json = resp.body;
+
+        user_->LoadProjectsFromJSONString(json);
+    } catch (const Poco::Exception& exc) {
+        return exc.displayText();
+    } catch (const std::exception& ex) {
+        return ex.what();
+    } catch (const std::string & ex) {
+        return ex;
+    }
+    return noError;
+}
+
+error Context::pullClients() {
+    std::string api_token = user_->APIToken();
+
+    if (api_token.empty()) {
+        return error("cannot pull user data without API token");
+    }
+
+    std::string json("");
+
+    try {
+        HTTPRequest req;
+        req.host = urls::API();
+        req.relative_url = "/api/v9/me/clients";
+        req.basic_auth_username = api_token;
+        req.basic_auth_password = "api_token";
+
+        HTTPResponse resp = TogglClient::GetInstance().Get(req);
+        if (resp.err != noError) {
+            if (resp.err.find(kForbiddenError) != std::string::npos) {
+                // User has no workspaces
+                return error(kMissingWS); // NOLINT
+            }
+            return resp.err;
+        }
+
+        json = resp.body;
+
+        user_->LoadClientsFromJSONString(json);
+    } catch (const Poco::Exception& exc) {
+        return exc.displayText();
+    } catch (const std::exception& ex) {
+        return ex.what();
+    } catch (const std::string & ex) {
+        return ex;
+    }
+    return noError;
+}
+
+error Context::pullTasks() {
+    std::string api_token = user_->APIToken();
+
+    if (api_token.empty()) {
+        return error("cannot pull user data without API token");
+    }
+
+    std::string json("");
+
+    try {
+        HTTPRequest req;
+        req.host = urls::API();
+        req.relative_url = "/api/v9/me/tasks";
+        req.basic_auth_username = api_token;
+        req.basic_auth_password = "api_token";
+
+        HTTPResponse resp = TogglClient::GetInstance().Get(req);
+        if (resp.err != noError) {
+            if (resp.err.find(kForbiddenError) != std::string::npos) {
+                // User has no workspaces
+                return error(kMissingWS); // NOLINT
+            }
+            return resp.err;
+        }
+
+        json = resp.body;
+
+        user_->LoadTasksFromJSONString(json);
+    } catch (const Poco::Exception& exc) {
+        return exc.displayText();
+    } catch (const std::exception& ex) {
+        return ex.what();
+    } catch (const std::string & ex) {
+        return ex;
+    }
+    return noError;
+}
+
+error Context::pullTags() {
+    std::string api_token = user_->APIToken();
+
+    if (api_token.empty()) {
+        return error("cannot pull user data without API token");
+    }
+
+    std::string json("");
+
+    try {
+        HTTPRequest req;
+        req.host = urls::API();
+        req.relative_url = "/api/v9/me/tags";
+        req.basic_auth_username = api_token;
+        req.basic_auth_password = "api_token";
+
+        HTTPResponse resp = TogglClient::GetInstance().Get(req);
+        if (resp.err != noError) {
+            if (resp.err.find(kForbiddenError) != std::string::npos) {
+                // User has no workspaces
+                return error(kMissingWS); // NOLINT
+            }
+            return resp.err;
+        }
+
+        json = resp.body;
+
+        user_->LoadTagsFromJSONString(json);
+    } catch (const Poco::Exception& exc) {
+        return exc.displayText();
+    } catch (const std::exception& ex) {
+        return ex.what();
+    } catch (const std::string & ex) {
+        return ex;
+    }
+    return noError;
 }
 
 error Context::pullWorkspaces() {

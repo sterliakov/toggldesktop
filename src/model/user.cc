@@ -798,6 +798,94 @@ error User::LoadTimeEntriesFromJSONString(const std::string & json) {
     return noError;
 }
 
+error User::LoadProjectsFromJSONString(const std::string & json) {
+    if (json.empty()) {
+        return noError;
+    }
+
+    Json::Value root;
+    Json::Reader reader;
+    if (!reader.parse(json, root)) {
+        return error("Failed to LoadProjectsFromJSONString");
+    }
+
+    std::set<Poco::UInt64> alive;
+
+    for (unsigned int i = 0; i < root.size(); i++) {
+        loadUserProjectFromSyncJSON(root[i], &alive, false);
+    }
+
+    deleteZombies(related.Projects, alive);
+
+    return noError;
+}
+
+error User::LoadClientsFromJSONString(const std::string & json) {
+    if (json.empty()) {
+        return noError;
+    }
+
+    Json::Value root;
+    Json::Reader reader;
+    if (!reader.parse(json, root)) {
+        return error("Failed to LoadClientsFromJSONString");
+    }
+
+    std::set<Poco::UInt64> alive;
+
+    for (unsigned int i = 0; i < root.size(); i++) {
+        loadUserClientFromSyncJSON(root[i], &alive, false);
+    }
+
+    deleteZombies(related.Clients, alive);
+
+    return noError;
+}
+
+error User::LoadTasksFromJSONString(const std::string & json) {
+    if (json.empty()) {
+        return noError;
+    }
+
+    Json::Value root;
+    Json::Reader reader;
+    if (!reader.parse(json, root)) {
+        return error("Failed to LoadTasksFromJSONString");
+    }
+
+    std::set<Poco::UInt64> alive;
+
+    for (unsigned int i = 0; i < root.size(); i++) {
+        loadUserTaskFromJSON(root[i], &alive);
+    }
+
+    deleteZombies(related.Tasks, alive);
+
+    return noError;
+}
+
+error User::LoadTagsFromJSONString(const std::string & json) {
+    if (json.empty()) {
+        return noError;
+    }
+
+    Json::Value root;
+    Json::Reader reader;
+    if (!reader.parse(json, root)) {
+        return error("Failed to LoadTagsFromJSONString");
+    }
+
+    std::set<Poco::UInt64> alive;
+
+    for (unsigned int i = 0; i < root.size(); i++) {
+        loadUserTagFromJSON(root[i], &alive);
+    }
+
+    deleteZombies(related.Tags, alive);
+
+    return noError;
+}
+
 void User::LoadUserAndRelatedDataFromJSON(
     const Json::Value &root,
     bool including_related_data,
@@ -818,10 +906,6 @@ void User::LoadUserAndRelatedDataFromJSON(
     // user is contained in Sync API but it is in root of data in v8
     error err = loadUserFromJSON(data.isMember("user") ? data["user"] : data);
     LoadUserPreferencesFromJSON(data.isMember("preferences") ? data["preferences"] : data, true);
-    // other entities are contained about the same
-    if (err == noError) {
-        loadRelatedDataFromJSON(data, including_related_data, syncServer);
-    }
 }
 
 error User::loadUserFromJSON(const Json::Value &data) {
@@ -839,110 +923,6 @@ error User::loadUserFromJSON(const Json::Value &data) {
     SetAPIToken(data["api_token"].asString());
     SetEmail(data["email"].asString());
     SetFullname(data["fullname"].asString());
-
-    return noError;
-}
-
-error User::loadRelatedDataFromJSON(
-    const Json::Value &data,
-    bool including_related_data,
-    bool syncServer) {
-
-    {
-        std::set<Poco::UInt64> alive;
-
-        if (data.isMember("workspaces")) {
-            Json::Value list = data["workspaces"];
-
-            for (unsigned int i = 0; i < list.size(); i++) {
-                loadUserWorkspaceFromJSON(list[i], &alive);
-            }
-        }
-
-        if (including_related_data) {
-            deleteZombies(related.Workspaces, alive);
-        }
-    }
-
-    {
-        std::set<Poco::UInt64> alive;
-
-        if (data.isMember("clients")) {
-            Json::Value list = data["clients"];
-
-            for (unsigned int i = 0; i < list.size(); i++) {
-                loadUserClientFromSyncJSON(list[i], &alive, syncServer);
-            }
-        }
-
-        if (including_related_data) {
-            deleteZombies(related.Clients, alive);
-        }
-    }
-
-    {
-        std::set<Poco::UInt64> alive;
-
-        if (data.isMember("projects")) {
-            Json::Value list = data["projects"];
-
-            for (unsigned int i = 0; i < list.size(); i++) {
-                loadUserProjectFromSyncJSON(list[i], &alive, syncServer);
-            }
-        }
-
-        if (including_related_data) {
-            deleteZombies(related.Projects, alive);
-        }
-    }
-
-    {
-        std::set<Poco::UInt64> alive;
-
-        if (data.isMember("tasks")) {
-            Json::Value list = data["tasks"];
-
-            for (unsigned int i = 0; i < list.size(); i++) {
-                loadUserTaskFromJSON(list[i], &alive);
-            }
-        }
-
-        if (including_related_data) {
-            deleteZombies(related.Tasks, alive);
-        }
-    }
-
-    {
-        std::set<Poco::UInt64> alive;
-
-        if (data.isMember("tags")) {
-            Json::Value list = data["tags"];
-
-            for (unsigned int i = 0; i < list.size(); i++) {
-                loadUserTagFromJSON(list[i], &alive);
-            }
-        }
-
-        if (including_related_data) {
-            deleteZombies(related.Tags, alive);
-        }
-    }
-
-    {
-        std::set<Poco::UInt64> alive;
-
-        if (data.isMember("time_entries")) {
-            Json::Value list = data["time_entries"];
-
-            for (unsigned int i = 0; i < list.size(); i++) {
-                loadUserTimeEntryFromJSON(list[i], &alive, syncServer);
-            }
-        }
-
-        if (including_related_data) {
-            deleteZombies(related.TimeEntries, alive);
-        }
-    }
 
     return noError;
 }

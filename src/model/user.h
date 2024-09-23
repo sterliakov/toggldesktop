@@ -150,9 +150,12 @@ class TOGGL_INTERNAL_EXPORT User : public BaseModel {
         bool including_related_data,
         bool syncServer);
 
-    error LoadWorkspacesFromJSONString(const std::string & json);
-
     error LoadTimeEntriesFromJSONString(const std::string &json);
+    error LoadProjectsFromJSONString(const std::string &json);
+    error LoadWorkspacesFromJSONString(const std::string & json);
+    error LoadClientsFromJSONString(const std::string &json);
+    error LoadTasksFromJSONString(const std::string &json);
+    error LoadTagsFromJSONString(const std::string &json);
 
     error SetAPITokenFromOfflineData(const std::string &password);
 
@@ -218,10 +221,6 @@ class TOGGL_INTERNAL_EXPORT User : public BaseModel {
 
     error loadUserFromJSON(
         const Json::Value &node);
-
-    error loadRelatedDataFromJSON(const Json::Value &node,
-        bool including_related_data,
-        bool syncServer);
 
     void loadUserUpdateFromJSON(
         Json::Value list);

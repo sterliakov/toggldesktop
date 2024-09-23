@@ -778,7 +778,12 @@ class TOGGL_INTERNAL_EXPORT Context : public TimelineDatasource {
 
     error logAndDisplayUserTriedEditingLockedEntry();
 
+    error pullTimeEntries();
+    error pullProjects();
     error pullWorkspaces();
+    error pullClients();
+    error pullTasks();
+    error pullTags();
 
     error pullWorkspacePreferences();
     error pullWorkspacePreferences(Workspace *workspace, std::string* json);
