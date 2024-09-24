@@ -785,6 +785,7 @@ class TOGGL_INTERNAL_EXPORT Context : public TimelineDatasource {
     error pullClients();
     error pullTasks();
     error pullTags();
+    error pullInitialObjects();
 
     error pullWorkspacePreferences();
     error pullWorkspacePreferences(Workspace *workspace, std::string* json);

@@ -5431,22 +5431,9 @@ error Context::pullAllUserData() {
             }
         }
 
-        std::vector<std::function<error()>> methods = {
-            [this] { return pullTimeEntries(); },
-            [this] { return pullProjects(); },
-            [this] { return pullWorkspaces(); },
-            [this] { return pullClients(); },
-            [this] { return pullTasks(); },
-            [this] { return pullTags(); },
-        };
-        std::vector<std::future<error>> futures(methods.size());
-        for (std::size_t i = 0; i < methods.size(); i++) {
-            futures[i] = std::async(std::launch::async, methods[i]);
-        }
-        for (auto &fut: futures) {
-            if ((err = fut.get()) != noError) {
-                return err;
-            }
+        err = pullInitialObjects();
+        if (err != noError) {
+            return err;
         }
 
         stopwatch.stop();
@@ -6265,6 +6252,28 @@ error Context::pullWorkspaces() {
         return error(kMissingWS); // NOLINT
     }
     return err;
+}
+
+error Context::pullInitialObjects() {
+    std::vector<std::function<error()>> methods = {
+        [this] { return pullTimeEntries(); },
+        [this] { return pullProjects(); },
+        [this] { return pullWorkspaces(); },
+        [this] { return pullClients(); },
+        [this] { return pullTasks(); },
+        [this] { return pullTags(); },
+    };
+    std::vector<std::future<error>> futures(methods.size());
+    for (std::size_t i = 0; i < methods.size(); i++) {
+        futures[i] = std::async(std::launch::async, methods[i]);
+    }
+    for (auto &fut: futures) {
+        error err = fut.get();
+        if (err != noError) {
+            return err;
+        }
+    }
+    return noError;
 }
 
 error Context::pullWorkspacePreferences() {
