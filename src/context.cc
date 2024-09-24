@@ -11,6 +11,7 @@
 
 #include "context.h"
 
+#include <future>
 #include <iostream>  // NOLINT
 
 #include "model/autotracker.h"
@@ -5430,7 +5431,7 @@ error Context::pullAllUserData() {
             }
         }
 
-        std::function<error()> methods[] = {
+        std::vector<std::function<error()>> methods = {
             [this] { return pullTimeEntries(); },
             [this] { return pullProjects(); },
             [this] { return pullWorkspaces(); },
@@ -5438,9 +5439,12 @@ error Context::pullAllUserData() {
             [this] { return pullTasks(); },
             [this] { return pullTags(); },
         };
-        for (const auto &method: methods) {
-            err = method();
-            if (err != noError) {
+        std::vector<std::future<error>> futures(methods.size());
+        for (std::size_t i = 0; i < methods.size(); i++) {
+            futures[i] = std::async(std::launch::async, methods[i]);
+        }
+        for (auto &fut: futures) {
+            if ((err = fut.get()) != noError) {
                 return err;
             }
         }
