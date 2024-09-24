@@ -2688,6 +2688,11 @@ error Context::Login(
             return displayError(err);
         }
 
+        err = pullInitialObjects();
+        if (err != noError) {
+            return displayError(err);
+        }
+
         {
             Poco::Mutex::ScopedLock lock(user_m_);
             if (!user_) {
