@@ -1,6 +1,15 @@
 # ⚠️ Project Status
 
-This is a fork of a discontinued Toggl app. The sole purpose of this repository is to keep it working under linux - apparently, upstream maintainers no longer care about us.
+**This project is superseded by another implementation.**
+
+I no longer use it myself and have developed a Toggl client from scratch in Rust
+as a replacement. If you feel interested, please give it a try! It's free and available at
+https://github.com/sterliakov/toggl
+(and also supports easier installation methods - binary download, `npm` and `cargo`!)
+
+This is a fork of a discontinued Toggl app. The sole purpose of this repository 
+is to keep it working under linux - apparently, upstream maintainers 
+no longer care about us.
 
 It may build or not build on other platforms. I'm using this on Ubuntu only, 
 but any other distros are more than welcome - please open pull requests 
